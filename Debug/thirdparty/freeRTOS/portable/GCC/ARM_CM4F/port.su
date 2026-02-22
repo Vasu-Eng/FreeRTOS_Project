@@ -1,0 +1,13 @@
+../thirdparty/freeRTOS/portable/GCC/ARM_CM4F/port.c:203:15:pxPortInitialiseStack	24	static
+../thirdparty/freeRTOS/portable/GCC/ARM_CM4F/port.c:235:13:prvTaskExitError	24	static,ignoring_inline_asm
+../thirdparty/freeRTOS/portable/GCC/ARM_CM4F/port.c:261:6:vPortSVCHandler	0	static,ignoring_inline_asm
+../thirdparty/freeRTOS/portable/GCC/ARM_CM4F/port.c:280:13:prvPortStartFirstTask	0	static,ignoring_inline_asm
+../thirdparty/freeRTOS/portable/GCC/ARM_CM4F/port.c:307:12:xPortStartScheduler	56	static,ignoring_inline_asm
+../thirdparty/freeRTOS/portable/GCC/ARM_CM4F/port.c:469:6:vPortEndScheduler	16	static,ignoring_inline_asm
+../thirdparty/freeRTOS/portable/GCC/ARM_CM4F/port.c:477:6:vPortEnterCritical	16	static,ignoring_inline_asm
+../thirdparty/freeRTOS/portable/GCC/ARM_CM4F/port.c:494:6:vPortExitCritical	16	static,ignoring_inline_asm
+../thirdparty/freeRTOS/portable/GCC/ARM_CM4F/port.c:506:6:xPortPendSVHandler	0	static,ignoring_inline_asm
+../thirdparty/freeRTOS/portable/GCC/ARM_CM4F/port.c:563:6:xPortSysTickHandler	16	static,ignoring_inline_asm
+../thirdparty/freeRTOS/portable/GCC/ARM_CM4F/port.c:815:32:vPortSetupTimerInterrupt	4	static
+../thirdparty/freeRTOS/portable/GCC/ARM_CM4F/port.c:837:13:vPortEnableVFP	0	static,ignoring_inline_asm
+../thirdparty/freeRTOS/portable/GCC/ARM_CM4F/port.c:854:10:vPortValidateInterruptPriority	24	static,ignoring_inline_asm
