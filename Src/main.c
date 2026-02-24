@@ -7,26 +7,37 @@ TaskHandle_t task2_handle;
 
 uint32_t SystemCoreClock = 16000000;
 
+#define DWT_CTRL    *((volatile uint32_t*)0xE0001000)
+#define CYCCNTENA   (1U<<0)
 
 
 void task1_handler(void *parameter){
 
 	while(1){
 	   printf("%s\n",(char*)parameter);
-//	   taskYIELD();
+	   taskYIELD();
+//		vTaskDelay(1000);
 	}
 	vTaskDelete(task1_handle);
 }
 void task2_handler(void *parameter){
 	while(1){
 		printf("%s\n",(char*)parameter);
-//		taskYIELD();
+		taskYIELD();
+//		vTaskDelay(1000);
 	}
 	vTaskDelete(task2_handle);
 }
 
 
 int main(void){
+	/*** Enable Count register for STM32 ******/
+	 DWT_CTRL |= CYCCNTENA;
+
+	 	 SEGGER_SYSVIEW_Conf();
+
+	 	 SEGGER_SYSVIEW_Start();
+
 	 BaseType_t task1_status = xTaskCreate(task1_handler,"Task-1",200,"Hello from Task1",2,&task1_handle);
 	 configASSERT(task1_status== pdPASS);
 	 BaseType_t task2_status = xTaskCreate(task2_handler,"Task-2",200,"Hello from Task2",2,&task2_handle);

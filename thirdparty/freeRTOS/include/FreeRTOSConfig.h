@@ -10,7 +10,7 @@
 /* Cortex-M4F specific definitions */
 #define configCPU_CLOCK_HZ              ( SystemCoreClock )
 #define configTICK_RATE_HZ              ( ( TickType_t ) 1000 )   /* 1 ms tick */
-#define configUSE_PREEMPTION            1
+#define configUSE_PREEMPTION            0
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
 #define configMAX_PRIORITIES            7
 #define configMINIMAL_STACK_SIZE        ( ( uint16_t ) 128 )
@@ -36,7 +36,7 @@
 #define configMAX_CO_ROUTINE_PRIORITIES 2
 
 /* Software timer definitions */
-#define configUSE_TIMERS                1
+#define configUSE_TIMERS                0
 #define configTIMER_TASK_PRIORITY       ( configMAX_PRIORITIES - 1 )
 #define configTIMER_QUEUE_LENGTH        10
 #define configTIMER_TASK_STACK_DEPTH    256
@@ -81,6 +81,9 @@
 #define INCLUDE_xTaskGetSchedulerState  1
 #define INCLUDE_xTaskGetCurrentTaskHandle 1
 #define INCLUDE_xTaskGetTickCount       1
+/****** SEGGER Settings **********/
+#define INCLUDE_xTaskGetIdleTaskHandle  1
+#define INCLUDE_pxTaskGetStackStart     1
 
 /*-----------------------------------------------------------
  * Cortex-M specific FreeRTOS port definitions.
@@ -95,5 +98,11 @@
  *----------------------------------------------------------*/
 
 #define configASSERT( x ) if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for( ;; ); }
+
+#define         SVC_Handler      vPortSVCHandler
+#define	       PendSV_Handler   xPortPendSVHandler
+#define		   SysTick_Handler  xPortSysTickHandler
+
+#include "SEGGER_SYSVIEW_FreeRTOS.h"
 
 #endif /* FREERTOS_CONFIG_H */

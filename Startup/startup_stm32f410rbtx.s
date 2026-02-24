@@ -268,7 +268,6 @@ g_pfnVectors:
 	.weak	SVC_Handler
 	.thumb_set SVC_Handler,vPortSVCHandler
 
-
 	.weak	DebugMon_Handler
 	.thumb_set DebugMon_Handler,Default_Handler
 

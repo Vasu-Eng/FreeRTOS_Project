@@ -1,12 +1,12 @@
-../thirdparty/freeRTOS/queue.c:303:12:xQueueGenericReset	10
+../thirdparty/freeRTOS/queue.c:303:12:xQueueGenericReset	9
 ../thirdparty/freeRTOS/queue.c:502:19:xQueueGenericCreate	7
 ../thirdparty/freeRTOS/queue.c:566:13:prvInitialiseNewQueue	2
-../thirdparty/freeRTOS/queue.c:939:12:xQueueGenericSend	23
+../thirdparty/freeRTOS/queue.c:939:12:xQueueGenericSend	21
 ../thirdparty/freeRTOS/queue.c:1157:12:xQueueGenericSendFromISR	16
 ../thirdparty/freeRTOS/queue.c:1329:12:xQueueGiveFromISR	13
-../thirdparty/freeRTOS/queue.c:1502:12:xQueueReceive	19
-../thirdparty/freeRTOS/queue.c:1652:12:xQueueSemaphoreTake	17
-../thirdparty/freeRTOS/queue.c:1877:12:xQueuePeek	19
+../thirdparty/freeRTOS/queue.c:1502:12:xQueueReceive	18
+../thirdparty/freeRTOS/queue.c:1652:12:xQueueSemaphoreTake	16
+../thirdparty/freeRTOS/queue.c:1877:12:xQueuePeek	18
 ../thirdparty/freeRTOS/queue.c:2035:12:xQueueReceiveFromISR	12
 ../thirdparty/freeRTOS/queue.c:2135:12:xQueuePeekFromISR	7
 ../thirdparty/freeRTOS/queue.c:2197:13:uxQueueMessagesWaiting	2
@@ -25,4 +25,3 @@
 ../thirdparty/freeRTOS/queue.c:2635:12:xQueueIsQueueEmptyFromISR	3
 ../thirdparty/freeRTOS/queue.c:2659:19:prvIsQueueFull	2
 ../thirdparty/freeRTOS/queue.c:2680:12:xQueueIsQueueFullFromISR	3
-../thirdparty/freeRTOS/queue.c:3132:10:vQueueWaitForMessageRestricted	4
