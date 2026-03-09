@@ -41,59 +41,27 @@
 * DAMAGE.                                                            *
 *                                                                    *
 **********************************************************************
--------------------------- END-OF-HEADER -----------------------------
-
-File    : SEGGER_SYSVIEW_Conf.h
-Purpose : SEGGER SystemView configuration file.
-          Set defines which deviate from the defaults (see SEGGER_SYSVIEW_ConfDefaults.h) here.          
-Revision: $Rev: 21292 $
-
-Additional information:
-  Required defines which must be set are:
-    SEGGER_SYSVIEW_GET_TIMESTAMP
-    SEGGER_SYSVIEW_GET_INTERRUPT_ID
-  For known compilers and cores, these might be set to good defaults
-  in SEGGER_SYSVIEW_ConfDefaults.h.
-  
-  SystemView needs a (nestable) locking mechanism.
-  If not defined, the RTT locking mechanism is used,
-  which then needs to be properly configured.
+----------------------------------------------------------------------
+Purpose     : Publics for the synchronous SysView recorder state machine
+---------------------------END-OF-HEADER------------------------------
 */
 
-#ifndef SEGGER_SYSVIEW_CONF_H
-#define SEGGER_SYSVIEW_CONF_H
+#ifndef SEGGER_SYSVIEW_REC_H
+# define SEGGER_SYSVIEW_REC_H
 
-/*********************************************************************
-*
-*       Defines, configurable
-*
-**********************************************************************
-*/
+#include <SEGGER_SYSVIEW.h>
 
-/*********************************************************************
-*
-*       Define: SEGGER_SYSVIEW_SECTION
-*
-*  Description
-*    Section to place the SystemView RTT Buffer into.
-*  Default
-*    undefined: Do not place into a specific section.
-*  Notes
-*    If SEGGER_RTT_SECTION is defined, the default changes to use
-*    this section for the SystemView RTT Buffer, too.
-*/
-#if !(defined SEGGER_SYSVIEW_SECTION) && (defined SEGGER_RTT_BUFFER_SECTION)
-  #define SEGGER_SYSVIEW_SECTION                  SEGGER_RTT_BUFFER_SECTION
+#if defined(__cplusplus)
+extern "C" {     /* Make sure we have C-declarations in C++ programs */
 #endif
 
+int SYSVIEW_REC_GetOutgoing     (U8* pBuf, unsigned BufSize);
+int SYSVIEW_REC_ProcessIncoming (const U8* pBytes, unsigned NumBytes);
 
-/*********************************************************************
-* TODO: Add your defines here.
-**********************************************************************
-*/
+#if defined(__cplusplus)
+}
+#endif
 
- void SYSVIEW_UART_Config();
-
-#endif  // SEGGER_SYSVIEW_CONF_H
+#endif // SEGGER_SYSVIEW_REC_H
 
 /*************************** End of file ****************************/

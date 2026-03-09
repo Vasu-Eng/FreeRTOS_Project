@@ -12,6 +12,7 @@ RM := rm -rf
 -include thirdparty/freeRTOS/portable/MemMang/subdir.mk
 -include thirdparty/freeRTOS/portable/GCC/ARM_CM4F/subdir.mk
 -include thirdparty/freeRTOS/subdir.mk
+-include thirdparty/SEGGER/UART_RECORDER/subdir.mk
 -include thirdparty/SEGGER/SEGGER/Syscalls/subdir.mk
 -include thirdparty/SEGGER/SEGGER/subdir.mk
 -include thirdparty/SEGGER/OS/subdir.mk

@@ -1,7 +1,10 @@
 #include <FreeRTOS.h>
 #include"task.h"
 #include<stdio.h>
+#include"BSP_UART.h"
 #include"stm32f410rx.h"
+
+
 TaskHandle_t task1_handle;
 TaskHandle_t task2_handle;
 
@@ -31,8 +34,10 @@ void task2_handler(void *parameter){
 
 
 int main(void){
-	/*** Enable Count register for STM32 ******/
-	 DWT_CTRL |= CYCCNTENA;
+ 	     /*** Enable Count register for STM32 ******/
+ 	     DWT_CTRL |= CYCCNTENA;
+
+//	     SYSVIEW_UART_Config();
 
 	 	 SEGGER_SYSVIEW_Conf();
 

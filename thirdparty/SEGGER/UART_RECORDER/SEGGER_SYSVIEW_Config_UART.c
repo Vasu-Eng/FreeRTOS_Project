@@ -43,57 +43,139 @@
 **********************************************************************
 -------------------------- END-OF-HEADER -----------------------------
 
-File    : SEGGER_SYSVIEW_Conf.h
-Purpose : SEGGER SystemView configuration file.
-          Set defines which deviate from the defaults (see SEGGER_SYSVIEW_ConfDefaults.h) here.          
-Revision: $Rev: 21292 $
-
-Additional information:
-  Required defines which must be set are:
-    SEGGER_SYSVIEW_GET_TIMESTAMP
-    SEGGER_SYSVIEW_GET_INTERRUPT_ID
-  For known compilers and cores, these might be set to good defaults
-  in SEGGER_SYSVIEW_ConfDefaults.h.
-  
-  SystemView needs a (nestable) locking mechanism.
-  If not defined, the RTT locking mechanism is used,
-  which then needs to be properly configured.
+Purpose : The sample shows how to send/receive SysView via UART.
 */
-
-#ifndef SEGGER_SYSVIEW_CONF_H
-#define SEGGER_SYSVIEW_CONF_H
 
 /*********************************************************************
 *
-*       Defines, configurable
+*       #include section
+*
+**********************************************************************
+*/
+#include "BSP_UART.h"
+#include "SEGGER_SYSVIEW_REC.h"
+
+/*********************************************************************
+*
+*       Constants
+*
+**********************************************************************
+*/
+
+#define _SYSVIEW_UART_PORT          2             // use 0 for RS232 adapter on ExpIf 0 header.
+#define _SYSVIEW_UART_BAUDRATE      500000
+#define _SYSVIEW_UART_DATABITS      8
+#define _SYSVIEW_UART_PARITY        BSP_UART_PARITY_NONE
+#define _SYSVIEW_UART_STOPBITS      1
+
+/*********************************************************************
+*
+*       Static data
+*
+**********************************************************************
+*/
+
+static volatile int _UART_Busy = 0;
+
+/*********************************************************************
+*
+*       Static code
 *
 **********************************************************************
 */
 
 /*********************************************************************
 *
-*       Define: SEGGER_SYSVIEW_SECTION
+*       _SysView_TrySend()
 *
-*  Description
-*    Section to place the SystemView RTT Buffer into.
-*  Default
-*    undefined: Do not place into a specific section.
-*  Notes
-*    If SEGGER_RTT_SECTION is defined, the default changes to use
-*    this section for the SystemView RTT Buffer, too.
+*  Function description
+*    Try to send queued SysView data over the SysView output channel
+*
+*  Return value
+*     > 0: Amount of data that was transmitted successfully
+*    == 0: No data available to be transmitted
+*     < 0: Transmit channel was busy, no data sent
 */
-#if !(defined SEGGER_SYSVIEW_SECTION) && (defined SEGGER_RTT_BUFFER_SECTION)
-  #define SEGGER_SYSVIEW_SECTION                  SEGGER_RTT_BUFFER_SECTION
-#endif
+static int _SysView_TrySend(void) {
+  int Amount;
+  U8 Byte;
 
+  if (_UART_Busy) {
+    return -1;
+  } else {
+    Amount = SYSVIEW_REC_GetOutgoing(&Byte, 1);
+    if (Amount > 0) {
+      _UART_Busy = 1;
+      BSP_UART_Write1(_SYSVIEW_UART_PORT, Byte);
+      return Amount;
+    }
+    return 0;
+  }
+}
 
 /*********************************************************************
-* TODO: Add your defines here.
-**********************************************************************
+*
+*       _SysView_OnRxComplete()
+*
+*  Function description
+*    RX-complete callback for SysView input channel
 */
+static void _SysView_OnRxComplete(unsigned int Unit, unsigned char c) {
+  int ResponseReady;
 
- void SYSVIEW_UART_Config();
+  if (Unit == _SYSVIEW_UART_PORT) {
+    ResponseReady = SYSVIEW_REC_ProcessIncoming(&c, 1);
+    if (ResponseReady > 0) {
+      _SysView_TrySend();
+    }
+  }
+}
 
-#endif  // SEGGER_SYSVIEW_CONF_H
+/*********************************************************************
+*
+*       _SysView_OnTxComplete()
+*
+*  Function description
+*    TX-complete callback for SysView output channel
+*
+*  Return value
+*    == 0: There are more bytes to be sent
+*    != 0: Buffer empty, no more bytes to be sent.
+*/
+static int _SysView_OnTxComplete(unsigned int Unit) {
+  if (Unit == _SYSVIEW_UART_PORT) {
+    _UART_Busy = 0;
+    if (_SysView_TrySend() > 0) {
+      return 0;
+    }
+  }
+  return 1;
+}
 
-/*************************** End of file ****************************/
+/*********************************************************************
+*
+*       SEGGER_SYSVIEW_X_OnEventRecorded()
+*
+*  Function description
+*    Callback for SysView when it has some output available
+*/
+void SEGGER_SYSVIEW_X_OnEventRecorded(unsigned NumBytes) {
+  (void)NumBytes;
+  _SysView_TrySend();
+}
+
+/*********************************************************************
+*
+*       SYSVIEW_UART_Config
+*/
+void SYSVIEW_UART_Config(void);
+void SYSVIEW_UART_Config(void) {
+  //
+  // Init SystemView REC over UART.
+  //
+  BSP_UART_Init(_SYSVIEW_UART_PORT, _SYSVIEW_UART_BAUDRATE, _SYSVIEW_UART_DATABITS, _SYSVIEW_UART_PARITY, _SYSVIEW_UART_STOPBITS);
+  BSP_UART_SetReadCallback(_SYSVIEW_UART_PORT, _SysView_OnRxComplete);
+  BSP_UART_SetWriteCallback(_SYSVIEW_UART_PORT, _SysView_OnTxComplete);
+}
+
+/**************************** end of file ***************************/

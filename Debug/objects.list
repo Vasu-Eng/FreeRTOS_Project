@@ -1,3 +1,4 @@
+"./Src/BSP_UART.o"
 "./Src/main.o"
 "./Src/syscalls.o"
 "./Startup/startup_stm32f410rbtx.o"
@@ -8,6 +9,8 @@
 "./thirdparty/SEGGER/SEGGER/SEGGER_RTT_printf.o"
 "./thirdparty/SEGGER/SEGGER/SEGGER_SYSVIEW.o"
 "./thirdparty/SEGGER/SEGGER/Syscalls/SEGGER_RTT_Syscalls_GCC.o"
+"./thirdparty/SEGGER/UART_RECORDER/SEGGER_SYSVIEW_Config_UART.o"
+"./thirdparty/SEGGER/UART_RECORDER/SEGGER_SYSVIEW_REC.o"
 "./thirdparty/freeRTOS/croutine.o"
 "./thirdparty/freeRTOS/event_groups.o"
 "./thirdparty/freeRTOS/list.o"

@@ -28,6 +28,7 @@ thirdparty/SEGGER/Config \
 thirdparty/SEGGER/OS \
 thirdparty/SEGGER/SEGGER \
 thirdparty/SEGGER/SEGGER/Syscalls \
+thirdparty/SEGGER/UART_RECORDER \
 thirdparty/freeRTOS \
 thirdparty/freeRTOS/portable/GCC/ARM_CM4F \
 thirdparty/freeRTOS/portable/MemMang \

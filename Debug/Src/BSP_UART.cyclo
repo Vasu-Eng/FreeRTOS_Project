@@ -1,0 +1,7 @@
+C:/Users/kesha/Documents/Embedded Mastering/Git linked project/workspace/Project_freeRTOS_Learning/Drivers/CMSIS/Include/core_cm4.h:1684:22:__NVIC_EnableIRQ	2
+../Src/BSP_UART.c:15:10:calculate_usartdiv	3
+../Src/BSP_UART.c:36:6:BSP_UART_SetReadCallback	1
+../Src/BSP_UART.c:41:6:BSP_UART_SetWriteCallback	1
+../Src/BSP_UART.c:47:6:BSP_UART_Write1	4
+../Src/BSP_UART.c:62:6:BSP_UART_Init	3
+../Src/BSP_UART.c:106:6:USART2_IRQHandler	3
