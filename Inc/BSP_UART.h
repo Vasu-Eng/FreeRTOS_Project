@@ -25,6 +25,7 @@
 #define CR1_PCE    (1U<<10)
 #define CR1_PS     (1U<<9)
 #define CR1_RXNEIE (1U<<5)
+#define CR1_TXEIE  (1U<<7)
 
 
 #define BSP_UART_PARITY_NONE 0

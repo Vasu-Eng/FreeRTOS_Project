@@ -48,14 +48,10 @@ void BSP_UART_Write1(unsigned int Unit, uint8_t data){
 	(void)Unit;
 
     while(!(USART2->SR & SR_TXE)){}
+
     USART2->DR = data;
 
-     while(!(USART2->SR & SR_TC));
-     USART2->SR &= ~SR_TC;
-
-     if(_tx_cb){
-    	 _tx_cb(Unit);
-     }
+    USART2->CR1 |= CR1_TXEIE;
 }
 
 
@@ -104,7 +100,7 @@ void BSP_UART_Init(unsigned int Unit,unsigned int Baudrate,unsigned int Databits
 }
 
 void USART2_IRQHandler(void)
-{
+{   /***** Rx interrupt ******/
     if (USART2->SR & SR_RXNE)
     {
         uint8_t data = USART2->DR;
@@ -113,6 +109,15 @@ void USART2_IRQHandler(void)
             _rx_cb(2, data);
         }
     }
+    /****** Tx Interrupt *******/
+    if ((USART2->SR & SR_TXE) && (USART2->CR1 & CR1_TXEIE))
+    {
+        USART2->CR1 &= ~CR1_TXEIE;
+
+        if (_tx_cb)
+            _tx_cb(2);
+    }
+
 }
 
 

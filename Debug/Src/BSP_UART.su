@@ -3,5 +3,5 @@ C:/Users/kesha/Documents/Embedded Mastering/Git linked project/workspace/Project
 ../Src/BSP_UART.c:36:6:BSP_UART_SetReadCallback	16	static
 ../Src/BSP_UART.c:41:6:BSP_UART_SetWriteCallback	16	static
 ../Src/BSP_UART.c:47:6:BSP_UART_Write1	16	static
-../Src/BSP_UART.c:62:6:BSP_UART_Init	24	static
-../Src/BSP_UART.c:106:6:USART2_IRQHandler	16	static
+../Src/BSP_UART.c:58:6:BSP_UART_Init	24	static
+../Src/BSP_UART.c:102:6:USART2_IRQHandler	16	static

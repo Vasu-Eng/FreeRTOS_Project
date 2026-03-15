@@ -2,6 +2,6 @@ C:/Users/kesha/Documents/Embedded Mastering/Git linked project/workspace/Project
 ../Src/BSP_UART.c:15:10:calculate_usartdiv	3
 ../Src/BSP_UART.c:36:6:BSP_UART_SetReadCallback	1
 ../Src/BSP_UART.c:41:6:BSP_UART_SetWriteCallback	1
-../Src/BSP_UART.c:47:6:BSP_UART_Write1	4
-../Src/BSP_UART.c:62:6:BSP_UART_Init	3
-../Src/BSP_UART.c:106:6:USART2_IRQHandler	3
+../Src/BSP_UART.c:47:6:BSP_UART_Write1	2
+../Src/BSP_UART.c:58:6:BSP_UART_Init	3
+../Src/BSP_UART.c:102:6:USART2_IRQHandler	6
