@@ -11,18 +11,27 @@ uint32_t SystemCoreClock = 16000000;
 #define CYCCNTENA   (1U<<0)
 
 
+void Printf(char *ptr){
+	while(*ptr){
+		ITM_SendChar(*ptr++);
+	}
+}
+
+
 void task1_handler(void *parameter){
 
 	while(1){
-	   printf("%s\n",(char*)parameter);
+	   Printf((char*)parameter);
 	   taskYIELD();
 //		vTaskDelay(1000);
 	}
 	vTaskDelete(task1_handle);
 }
+
+
 void task2_handler(void *parameter){
 	while(1){
-		printf("%s\n",(char*)parameter);
+		Printf((char*)parameter);
 		taskYIELD();
 //		vTaskDelay(1000);
 	}
