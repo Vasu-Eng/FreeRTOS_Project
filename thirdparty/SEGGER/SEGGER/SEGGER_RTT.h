@@ -67,6 +67,8 @@ Revision: $Rev: 25842 $
 **********************************************************************
 */
 
+
+
 #ifndef RTT_USE_ASM
   //
   // Some cores support out-of-order memory accesses (reordering of memory accesses in the core)

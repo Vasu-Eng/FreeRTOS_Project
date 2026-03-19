@@ -31,32 +31,34 @@ void ITM_Print(const char *str)
 void task1_handler(void *parameter){
 
 	while(1){
-	   ITM_Print((char*)parameter);
-	   ITM_Print("/n");
+//	   ITM_Print((char*)parameter);
+//	   ITM_Print("/n");
 //	   taskYIELD();
 	   GPIOA->ODR ^=  LED1;
-	   vTaskDelay(100);
+//	   vTaskDelay(100);
+	   taskYIELD();
 	}
 	vTaskDelete(task1_handle);
 }
 void task2_handler(void *parameter){
 	while(1){
-		   ITM_Print((char*)parameter);
-		   ITM_Print("/n");
-//		taskYIELD();
+//		   ITM_Print((char*)parameter);
+//		   ITM_Print("/n");
 		   GPIOA->ODR ^=  LED2;
-		   vTaskDelay(200);
+//		   vTaskDelay(50);
+		   taskYIELD();
 	}
 	vTaskDelete(task2_handle);
 }
 
 void task3_handler(void *parameter){
 	while(1){
-		   ITM_Print((char*)parameter);
-		   ITM_Print("/n");
-   //	taskYIELD();
+//		   ITM_Print((char*)parameter);
+//		   ITM_Print("/n");
 		   GPIOA->ODR ^=  LED3;
-		   vTaskDelay(400);
+		   vTaskDelay(50);
+		   taskYIELD();
+
 	}
 	vTaskDelete(task3_handle);
 }
@@ -74,6 +76,7 @@ int main(void){
 
 	     SYSVIEW_UART_Config();
 		 SEGGER_SYSVIEW_Conf();
+//		 SEGGER_SYSVIEW_DisableEvents(SEGGER_SYSVIEW_EVTMASK_SYSTICK);
 	 	 SEGGER_SYSVIEW_Start();
 
 	 RCC->AHB1ENR |= GPIOAEN;

@@ -47,6 +47,7 @@ void BSP_UART_SetWriteCallback(unsigned int Unit, BSP_UART_TX_CB cb){
 
 void BSP_UART_Write1(unsigned int Unit, uint8_t data){
 	(void)Unit;
+	while (!(USART2->SR & SR_TXE));
     /* directly writing data */
     USART2->DR = data;
     /* enabling tx complete interrupt */

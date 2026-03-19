@@ -103,10 +103,10 @@ static int _SysView_TrySend(void) {
   if (_UART_Busy) {
     return -1;
   } else {
-    Amount = SYSVIEW_REC_GetOutgoing(&Byte, 1);
+    Amount = SYSVIEW_REC_GetOutgoing(&Byte,1);
     if (Amount > 0) {
       _UART_Busy = 1;
-      BSP_UART_Write1(_SYSVIEW_UART_PORT, Byte);
+      BSP_UART_Write1(_SYSVIEW_UART_PORT,Byte);
       return Amount;
     }
     return 0;
