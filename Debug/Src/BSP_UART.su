@@ -1,7 +1,7 @@
 C:/Users/kesha/Documents/Embedded Mastering/Git linked project/workspace/Project_freeRTOS_Learning/Drivers/CMSIS/Include/core_cm4.h:1684:22:__NVIC_EnableIRQ	16	static,ignoring_inline_asm
 ../Src/BSP_UART.c:15:10:calculate_usartdiv	64	static
-../Src/BSP_UART.c:36:6:BSP_UART_SetReadCallback	16	static
-../Src/BSP_UART.c:41:6:BSP_UART_SetWriteCallback	16	static
-../Src/BSP_UART.c:47:6:BSP_UART_Write1	16	static
-../Src/BSP_UART.c:58:6:BSP_UART_Init	24	static
-../Src/BSP_UART.c:102:6:USART2_IRQHandler	16	static
+../Src/BSP_UART.c:37:6:BSP_UART_SetReadCallback	16	static
+../Src/BSP_UART.c:42:6:BSP_UART_SetWriteCallback	16	static
+../Src/BSP_UART.c:48:6:BSP_UART_Write1	16	static
+../Src/BSP_UART.c:57:6:BSP_UART_Init	24	static
+../Src/BSP_UART.c:109:6:USART2_IRQHandler	16	static

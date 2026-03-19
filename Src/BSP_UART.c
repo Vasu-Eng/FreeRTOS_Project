@@ -33,6 +33,7 @@ uint16_t calculate_usartdiv( USART_TypeDef *USARTx, uint32_t fclk, uint32_t baud
 }
 
 
+
 void BSP_UART_SetReadCallback(unsigned int Unit, BSP_UART_RX_CB cb){
 	(void)Unit;
     _rx_cb = cb;
@@ -84,7 +85,7 @@ void BSP_UART_Init(unsigned int Unit,unsigned int Baudrate,unsigned int Databits
 	/*enable clock access to usart2 module */
 	RCC->APB1ENR |= USART2EN; // enable clock access
 	/*configure baudrate*/
-    USART2->BRR  = calculate_usartdiv(USART2,16000000,Baudrate,16);
+    USART2->BRR  = calculate_usartdiv(USART2,BSP_SYS_CLK_HZ/APB1_PRESCALER,Baudrate,16);
 
     if (Parity == BSP_UART_PARITY_EVEN) {
         USART2->CR1 |= CR1_PCE;

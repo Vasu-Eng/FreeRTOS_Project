@@ -1,9 +1,3 @@
-/*
- * BSP_UART.h
- *
- *  Created on: Mar 7, 2026
- *      Author: kesha
- */
 
 #ifndef SEGGER_UART_RECORDER_BSP_UART_H_
 #define SEGGER_UART_RECORDER_BSP_UART_H_
@@ -26,11 +20,15 @@
 #define CR1_PS     (1U<<9)
 #define CR1_RXNEIE (1U<<5)
 #define CR1_TXEIE  (1U<<7)
-
+#define CR1_TCIE   (1U<<6)
 
 #define BSP_UART_PARITY_NONE 0
 #define BSP_UART_PARITY_EVEN 1
 #define BSP_UART_PARITY_ODD  2
+
+/************* clock configuration ***/
+#define BSP_SYS_CLK_HZ   84000000U
+#define APB1_PRESCALER   2
 
 
 typedef void (*BSP_UART_RX_CB)(unsigned int Unit, unsigned char c);

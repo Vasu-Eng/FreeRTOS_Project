@@ -9,12 +9,11 @@ TaskHandle_t task1_handle;
 TaskHandle_t task2_handle;
 TaskHandle_t task3_handle;
 
-
-uint32_t SystemCoreClock = 16000000;
+uint32_t SystemCoreClock =  BSP_SYS_CLK_HZ;
+void Clock_84MHz_Init(void);
 
 #define DWT_CTRL    *((volatile uint32_t*)0xE0001000)
 #define CYCCNTENA   (1U<<0)
-
 
 #define LED1 (1U<<5)  //PA5
 #define LED2 (1U<<6)  //PA6
@@ -64,8 +63,10 @@ void task3_handler(void *parameter){
 
 
 int main(void){
+	/* initialize clock with 84MHz */
+	   Clock_84MHz_Init();
  	     /*** Enable Count register for STM32 ******/
- 	     DWT_CTRL |= CYCCNTENA;
+ 	   DWT_CTRL |= CYCCNTENA;
 
 //		CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 //		DWT->CYCCNT = 0;
@@ -95,4 +96,40 @@ int main(void){
 
 	}
 	return 0;
+}
+
+
+void Clock_84MHz_Init(void)
+{
+    /* 1. Enable HSI */
+    RCC->CR |= RCC_CR_HSION;
+    while (!(RCC->CR & RCC_CR_HSIRDY));
+
+    /* 2. Flash latency (84 MHz → 2WS) */
+    FLASH->ACR =
+        FLASH_ACR_LATENCY_2WS |
+        FLASH_ACR_ICEN |
+        FLASH_ACR_DCEN;
+
+    /* 3. Configure PLL */
+    RCC->PLLCFGR =
+        (16U << RCC_PLLCFGR_PLLM_Pos) |   // PLLM = 16
+        (336U << RCC_PLLCFGR_PLLN_Pos) |  // PLLN = 336
+        (1U << RCC_PLLCFGR_PLLP_Pos) |    // PLLP = 4
+        (7U << RCC_PLLCFGR_PLLQ_Pos) |    // PLLQ = 7
+        RCC_PLLCFGR_PLLSRC_HSI;           // HSI source
+
+    /* 4. Enable PLL */
+    RCC->CR |= RCC_CR_PLLON;
+    while (!(RCC->CR & RCC_CR_PLLRDY));
+
+    /* 5. Prescalers */
+    RCC->CFGR |=
+        RCC_CFGR_HPRE_DIV1  |   // AHB = 84 MHz
+        RCC_CFGR_PPRE1_DIV2 |   // APB1 = 42 MHz ✅
+        RCC_CFGR_PPRE2_DIV1;    // APB2 = 84 MHz
+
+    /* 6. Switch to PLL */
+    RCC->CFGR |= RCC_CFGR_SW_PLL;
+    while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
 }
