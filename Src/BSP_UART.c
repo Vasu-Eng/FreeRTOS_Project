@@ -46,12 +46,10 @@ void BSP_UART_SetWriteCallback(unsigned int Unit, BSP_UART_TX_CB cb){
 
 void BSP_UART_Write1(unsigned int Unit, uint8_t data){
 	(void)Unit;
-
-    while(!(USART2->SR & SR_TXE)){}
-
+    /* directly writing data */
     USART2->DR = data;
-
-    USART2->CR1 |= CR1_TXEIE;
+    /* enabling tx complete interrupt */
+    USART2->CR1 |= CR1_TCIE;
 }
 
 
@@ -72,6 +70,14 @@ void BSP_UART_Init(unsigned int Unit,unsigned int Baudrate,unsigned int Databits
 	GPIOA->AFR[0] |= (7U<<8);
     /* select the specific mode of Af for USART2*/
     GPIOA->AFR[0] |= (7U<<12);
+
+/*
+     VERY IMPORTANT
+    GPIOA->PUPDR &= ~((3U<<4) | (3U<<6));
+    GPIOA->PUPDR |=  (1U<<6);   // Pull-up on RX
+
+    GPIOA->OSPEEDR |= (3U<<4) | (3U<<6);  // High speed
+*/
 
 	/***********Configure USART module ************/
 
@@ -109,15 +115,22 @@ void USART2_IRQHandler(void)
             _rx_cb(2, data);
         }
     }
-    /****** Tx Interrupt *******/
-    if ((USART2->SR & SR_TXE) && (USART2->CR1 & CR1_TXEIE))
+
+    /******** TX COMPLETE ********/
+    if (USART2->SR & SR_TC)
     {
-        USART2->CR1 &= ~CR1_TXEIE;
+        /* Clear TC properly */
+        USART2->SR &= ~SR_TC;
 
+        /* Disable TC interrupt */
+        USART2->CR1 &= ~CR1_TCIE;
+
+        /* Notify SEGGER */
         if (_tx_cb)
+        {
             _tx_cb(2);
+        }
     }
-
 }
 
 

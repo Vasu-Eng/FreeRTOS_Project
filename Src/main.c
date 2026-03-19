@@ -12,33 +12,52 @@ TaskHandle_t task3_handle;
 
 uint32_t SystemCoreClock = 16000000;
 
-//#define DWT_CTRL    *((volatile uint32_t*)0xE0001000)
-//#define CYCCNTENA   (1U<<0)
+#define DWT_CTRL    *((volatile uint32_t*)0xE0001000)
+#define CYCCNTENA   (1U<<0)
+
+
+#define LED1 (1U<<5)  //PA5
+#define LED2 (1U<<6)  //PA6
+#define LED3 (1U<<7)  //PA7
+#define GPIPAEN (1U<<0)
+
+
+void ITM_Print(const char *str)
+{
+    while(*str)
+        ITM_SendChar(*str++);
+}
 
 
 void task1_handler(void *parameter){
 
 	while(1){
-//	   printf("%s\n",(char*)parameter);
+	   ITM_Print((char*)parameter);
+	   ITM_Print("/n");
 //	   taskYIELD();
-		vTaskDelay(1000);
+	   GPIOA->ODR ^=  LED1;
+	   vTaskDelay(100);
 	}
 	vTaskDelete(task1_handle);
 }
 void task2_handler(void *parameter){
 	while(1){
-//		printf("%s\n",(char*)parameter);
+		   ITM_Print((char*)parameter);
+		   ITM_Print("/n");
 //		taskYIELD();
-		vTaskDelay(1000);
+		   GPIOA->ODR ^=  LED2;
+		   vTaskDelay(200);
 	}
 	vTaskDelete(task2_handle);
 }
 
 void task3_handler(void *parameter){
 	while(1){
-//		printf("%s\n",(char*)parameter);
-//		taskYIELD();
-		vTaskDelay(1000);
+		   ITM_Print((char*)parameter);
+		   ITM_Print("/n");
+   //	taskYIELD();
+		   GPIOA->ODR ^=  LED3;
+		   vTaskDelay(400);
 	}
 	vTaskDelete(task3_handle);
 }
@@ -46,15 +65,24 @@ void task3_handler(void *parameter){
 
 int main(void){
  	     /*** Enable Count register for STM32 ******/
-// 	     DWT_CTRL |= CYCCNTENA;
+ 	     DWT_CTRL |= CYCCNTENA;
+
+//		CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+//		DWT->CYCCNT = 0;
+//		DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+
 	     SYSVIEW_UART_Config();
 		 SEGGER_SYSVIEW_Conf();
-
-	 	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-	 	DWT->CYCCNT = 0;
-	 	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-
 	 	 SEGGER_SYSVIEW_Start();
+
+	 RCC->AHB1ENR |= GPIOAEN;
+	 // LED1 output
+	 GPIOA->MODER |= (1U<<10);
+	 // LED2 output
+	 GPIOA->MODER |= (1U<<12);
+	 // LED3 output
+	 GPIOA->MODER |= (1U<<14);
+
 
 	 BaseType_t task1_status = xTaskCreate(task1_handler,"Task-1",200,"Hello from Task1",2,&task1_handle);
 	 configASSERT(task1_status== pdPASS);

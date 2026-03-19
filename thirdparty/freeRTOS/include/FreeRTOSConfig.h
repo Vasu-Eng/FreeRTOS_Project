@@ -9,8 +9,8 @@
 
 /* Cortex-M4F specific definitions */
 #define configCPU_CLOCK_HZ              ( SystemCoreClock )
-#define configTICK_RATE_HZ              ( ( TickType_t ) 1000 )   /* 1 ms tick */
-#define configUSE_PREEMPTION            0
+#define configTICK_RATE_HZ              ( ( TickType_t ) 500 )   /* 2 ms tick */
+#define configUSE_PREEMPTION            1
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
 #define configMAX_PRIORITIES            7
 #define configMINIMAL_STACK_SIZE        ( ( uint16_t ) 128 )

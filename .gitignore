@@ -1,0 +1,27 @@
+# Build directories
+Debug/
+build/
+
+# Compiler artifacts
+*.o
+*.d
+*.su
+*.cyclo
+
+# ELF / binary outputs
+*.elf
+*.bin
+*.hex
+*.map
+
+# Eclipse / STM32CubeIDE junk
+.settings/
+*.launch
+
+# Mac / Linux junk
+.DS_StoreDebug*
+build/
+*.o
+*.d
+*.su
+*.cyclo
