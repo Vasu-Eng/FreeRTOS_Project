@@ -21,6 +21,8 @@ void Clock_84MHz_Init(void);
 #define GPIPAEN (1U<<0)
 
 
+
+
 void ITM_Print(const char *str)
 {
     while(*str)
@@ -29,36 +31,39 @@ void ITM_Print(const char *str)
 
 
 void task1_handler(void *parameter){
-
+	   TickType_t  LastTickCount = xTaskGetTickCount();
+	   TickType_t frequency = pdMS_TO_TICKS(1000);
 	while(1){
 //	   ITM_Print((char*)parameter);
 //	   ITM_Print("/n");
-//	   taskYIELD();
 	   GPIOA->ODR ^=  LED1;
-//	   vTaskDelay(100);
-	   taskYIELD();
+	   vTaskDelayUntil(&LastTickCount,frequency);
+//	   taskYIELD();
 	}
 	vTaskDelete(task1_handle);
 }
 void task2_handler(void *parameter){
+	   TickType_t  LastTickCount = xTaskGetTickCount();
+	   TickType_t frequency = pdMS_TO_TICKS(500);
 	while(1){
 //		   ITM_Print((char*)parameter);
 //		   ITM_Print("/n");
 		   GPIOA->ODR ^=  LED2;
-//		   vTaskDelay(50);
-		   taskYIELD();
+		   vTaskDelayUntil(&LastTickCount,frequency);
+//		   taskYIELD();
 	}
 	vTaskDelete(task2_handle);
 }
 
 void task3_handler(void *parameter){
+	   TickType_t  LastTickCount = xTaskGetTickCount();
+	   TickType_t frequency = pdMS_TO_TICKS(100);
 	while(1){
 //		   ITM_Print((char*)parameter);
 //		   ITM_Print("/n");
 		   GPIOA->ODR ^=  LED3;
-		   vTaskDelay(50);
-		   taskYIELD();
-
+		   vTaskDelayUntil(&LastTickCount,frequency);
+//		   taskYIELD();
 	}
 	vTaskDelete(task3_handle);
 }
