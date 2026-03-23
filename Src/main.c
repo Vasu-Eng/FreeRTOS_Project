@@ -8,98 +8,145 @@
 TaskHandle_t task1_handle;
 TaskHandle_t task2_handle;
 TaskHandle_t task3_handle;
+TaskHandle_t task4_handle;
+TaskHandle_t next_task_handle = NULL;
 
 uint32_t SystemCoreClock =  BSP_SYS_CLK_HZ;
 void Clock_84MHz_Init(void);
 
 #define DWT_CTRL    *((volatile uint32_t*)0xE0001000)
 #define CYCCNTENA   (1U<<0)
+#define LED1        (1U<<5)  //PA5
+#define LED2        (1U<<6)  //PA6
+#define LED3        (1U<<7)  //PA7
+#define BUTTON_PIN  (1U<<13) //PC13
+#define GPIOAEN     (1U<<0)
+#define GPIOCEN      (1U<<2)
 
-#define LED1 (1U<<5)  //PA5
-#define LED2 (1U<<6)  //PA6
-#define LED3 (1U<<7)  //PA7
-#define GPIPAEN (1U<<0)
 
-
-
-
-void ITM_Print(const char *str)
+void ITM_Print( char *str)
 {
     while(*str)
         ITM_SendChar(*str++);
 }
 
+void ITM_PrintInt(int val)
+{
+    char buf[20];
+    sprintf(buf, "%d\r\n", val);
+    ITM_Print(buf);
+}
+
+int button_read(){
+	if(GPIOC->IDR & BUTTON_PIN){
+		return 1;
+	}
+	else return 0;
+}
+
 
 void task1_handler(void *parameter){
-	   TickType_t  LastTickCount = xTaskGetTickCount();
-	   TickType_t frequency = pdMS_TO_TICKS(1000);
+	BaseType_t status;
 	while(1){
 //	   ITM_Print((char*)parameter);
 //	   ITM_Print("/n");
 	   GPIOA->ODR ^=  LED1;
-	   vTaskDelayUntil(&LastTickCount,frequency);
-//	   taskYIELD();
+	   status = xTaskNotifyWait(0,0,0,pdMS_TO_TICKS(1000));
+	   if(status == pdPASS){
+		   vTaskDelete(NULL);
+	   }
 	}
-	vTaskDelete(task1_handle);
 }
 void task2_handler(void *parameter){
-	   TickType_t  LastTickCount = xTaskGetTickCount();
-	   TickType_t frequency = pdMS_TO_TICKS(500);
+	   BaseType_t status;
 	while(1){
 //		   ITM_Print((char*)parameter);
 //		   ITM_Print("/n");
 		   GPIOA->ODR ^=  LED2;
-		   vTaskDelayUntil(&LastTickCount,frequency);
-//		   taskYIELD();
+		   status = xTaskNotifyWait(0,0,0,pdMS_TO_TICKS(100));
+		   if(status == pdPASS){
+  			  vTaskSuspendAll();
+  			  next_task_handle = task3_handle;
+  			  xTaskResumeAll();
+			  vTaskDelete(NULL);
+		   }
+		}
 	}
-	vTaskDelete(task2_handle);
-}
 
 void task3_handler(void *parameter){
-	   TickType_t  LastTickCount = xTaskGetTickCount();
-	   TickType_t frequency = pdMS_TO_TICKS(100);
+	   BaseType_t status;
 	while(1){
 //		   ITM_Print((char*)parameter);
 //		   ITM_Print("/n");
 		   GPIOA->ODR ^=  LED3;
-		   vTaskDelayUntil(&LastTickCount,frequency);
-//		   taskYIELD();
-	}
-	vTaskDelete(task3_handle);
+		   status = xTaskNotifyWait(0,0,0,pdMS_TO_TICKS(500));
+		   if(status == pdPASS){
+			   vTaskDelete(NULL);
+		   }
+		}
 }
 
 
+void task4_handler(void *parameter){
+	volatile int button_status = 1;
+	int pre_button_status = 1;
+	//    	 ITM_Print( "button_status : ");
+	//    	 ITM_PrintInt( button_status);
+	//    	 ITM_Print("\n");
+     while(1){
+    	 button_status  = button_read();
+    	 if(!button_status){
+    		 if(pre_button_status){
+//    			 ITM_Print( "button is pressed now \n");
+    			 xTaskNotify(next_task_handle,0,eNoAction);
+    			 vTaskSuspendAll();
+    			 next_task_handle = task2_handle;
+    			 xTaskResumeAll();
+
+    		 }
+    	 }
+    	 pre_button_status = button_status;
+         vTaskDelay(pdMS_TO_TICKS(10));
+     }
+
+}
+
+
+
+
 int main(void){
-	/* initialize clock with 84MHz */
-	   Clock_84MHz_Init();
- 	     /*** Enable Count register for STM32 ******/
- 	   DWT_CTRL |= CYCCNTENA;
-
-//		CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-//		DWT->CYCCNT = 0;
-//		DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-
-	     SYSVIEW_UART_Config();
-		 SEGGER_SYSVIEW_Conf();
-//		 SEGGER_SYSVIEW_DisableEvents(SEGGER_SYSVIEW_EVTMASK_SYSTICK);
-	 	 SEGGER_SYSVIEW_Start();
+     /* initialize clock with 84MHz */
+     Clock_84MHz_Init();
+	 /*** Enable Count register for STM32 ******/
+	 DWT_CTRL |= CYCCNTENA;
+     //SYSVIEW_UART_Config();
+	 SEGGER_SYSVIEW_Conf();
+	 SEGGER_SYSVIEW_Start();
 
 	 RCC->AHB1ENR |= GPIOAEN;
+	 RCC->AHB1ENR |= GPIOCEN;
 	 // LED1 output
 	 GPIOA->MODER |= (1U<<10);
 	 // LED2 output
 	 GPIOA->MODER |= (1U<<12);
 	 // LED3 output
 	 GPIOA->MODER |= (1U<<14);
+     // Button pin input
+	 GPIOC->MODER &= ~(3U << 26); // set as an input
 
 
-	 BaseType_t task1_status = xTaskCreate(task1_handler,"Task-1",200,"Hello from Task1",2,&task1_handle);
+
+	 BaseType_t task1_status = xTaskCreate(task1_handler,"Task-1",200,"Hello from Task1",3,&task1_handle);
 	 configASSERT(task1_status== pdPASS);
 	 BaseType_t task2_status = xTaskCreate(task2_handler,"Task-2",200,"Hello from Task2",2,&task2_handle);
      configASSERT(task2_status== pdPASS);
-	 BaseType_t task3_status = xTaskCreate(task3_handler,"Task-3",200,"Hello from Task3",2,&task3_handle);
+	 BaseType_t task3_status = xTaskCreate(task3_handler,"Task-3",200,"Hello from Task3",1,&task3_handle);
      configASSERT(task3_status== pdPASS);
+	 BaseType_t task4_status = xTaskCreate(task4_handler,"Task-4",200,"Hello from Task4",4,&task4_handle);
+     configASSERT(task4_status== pdPASS);
+	 next_task_handle = task1_handle;
      vTaskStartScheduler();
+
 	while(1){
 
 	}
