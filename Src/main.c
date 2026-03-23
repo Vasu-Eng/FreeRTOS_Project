@@ -21,8 +21,11 @@ void Clock_84MHz_Init(void);
 #define LED3        (1U<<7)  //PA7
 #define BUTTON_PIN  (1U<<13) //PC13
 #define GPIOAEN     (1U<<0)
-#define GPIOCEN      (1U<<2)
+#define GPIOCEN     (1U<<2)
+#define SYSCFGEN    (1U<<14)
 
+
+volatile int button_status = -1;
 
 void ITM_Print( char *str)
 {
@@ -44,6 +47,35 @@ int button_read(){
 	else return 0;
 }
 
+void EXTI15_10_IRQHandler(){
+    if(EXTI->PR & (1U<<13)){
+    	 EXTI->PR |= (1U<<13);
+    	 // if this is trigger that  means button was triggered
+    	 xTaskNotifyFromISR(next_task_handle,0,eNoAction,NULL);
+//    	 button_status  = button_read();
+//		 ITM_Print( "button_status : ");
+//		 ITM_PrintInt( button_status);
+//		 ITM_Print("\n");
+    }
+}
+
+void EXTI_configuration_for_pc13_button_pin (){
+
+    // Button pin input configuration
+	 GPIOC->MODER &= ~(3U << 26); // set as an input
+    // using Pullup register
+	 GPIOC->PUPDR |= (1U<<26);
+     SYSCFG->EXTICR[3] |= (2U<<4); // Connecting EXTI13 line
+     // unmask the interrupt MR13  line
+    EXTI->IMR |= (1U<<13);
+	//falling edge selection register
+	EXTI->FTSR |= (1U<<13);
+	// set priority in NVIC
+	NVIC_SetPriority(EXTI15_10_IRQn,6);
+	// enable handler in NVIC
+	NVIC_EnableIRQ(EXTI15_10_IRQn);
+}
+
 
 void task1_handler(void *parameter){
 	BaseType_t status;
@@ -53,62 +85,66 @@ void task1_handler(void *parameter){
 	   GPIOA->ODR ^=  LED1;
 	   status = xTaskNotifyWait(0,0,0,pdMS_TO_TICKS(1000));
 	   if(status == pdPASS){
-		   vTaskDelete(NULL);
+		   portENTER_CRITICAL();
+		   next_task_handle = task2_handle;
+		   portEXIT_CRITICAL();
+		   ITM_Print( " task 1 is deleting \n");
+//		   vTaskDelete(NULL);
+		   vTaskSuspend(NULL);
 	   }
 	}
 }
 void task2_handler(void *parameter){
-	   BaseType_t status;
+	BaseType_t status;
 	while(1){
 //		   ITM_Print((char*)parameter);
 //		   ITM_Print("/n");
 		   GPIOA->ODR ^=  LED2;
 		   status = xTaskNotifyWait(0,0,0,pdMS_TO_TICKS(100));
 		   if(status == pdPASS){
-  			  vTaskSuspendAll();
-  			  next_task_handle = task3_handle;
-  			  xTaskResumeAll();
-			  vTaskDelete(NULL);
+			   portENTER_CRITICAL();
+			   next_task_handle = task3_handle;
+			   portEXIT_CRITICAL();
+			   ITM_Print( " task 2 is deleting \n");
+//			   vTaskDelete(NULL);
+			   vTaskSuspend(NULL);
 		   }
 		}
 	}
 
 void task3_handler(void *parameter){
-	   BaseType_t status;
+	BaseType_t status;
 	while(1){
 //		   ITM_Print((char*)parameter);
 //		   ITM_Print("/n");
 		   GPIOA->ODR ^=  LED3;
 		   status = xTaskNotifyWait(0,0,0,pdMS_TO_TICKS(500));
 		   if(status == pdPASS){
-			   vTaskDelete(NULL);
+			   ITM_Print( " task 3 is deleting \n");
+//			   vTaskDelete(NULL);
+			   portENTER_CRITICAL();
+			   next_task_handle = task4_handle;
+			   portEXIT_CRITICAL();
+			   vTaskSuspend(NULL);
 		   }
 		}
 }
 
 
 void task4_handler(void *parameter){
-	volatile int button_status = 1;
-	int pre_button_status = 1;
-	//    	 ITM_Print( "button_status : ");
-	//    	 ITM_PrintInt( button_status);
-	//    	 ITM_Print("\n");
-     while(1){
-    	 button_status  = button_read();
-    	 if(!button_status){
-    		 if(pre_button_status){
-//    			 ITM_Print( "button is pressed now \n");
-    			 xTaskNotify(next_task_handle,0,eNoAction);
-    			 vTaskSuspendAll();
-    			 next_task_handle = task2_handle;
-    			 xTaskResumeAll();
+	BaseType_t status;
+	while(1){
+		   status = xTaskNotifyWait(0,0,0,pdMS_TO_TICKS(500));
+		   if(status == pdPASS){
+			   ITM_Print( " resuming all tasks \n");
+//			   vTaskDelete(NULL);
+			   vTaskResume(task1_handle);
+			   vTaskResume(task2_handle);
+			   vTaskResume(task3_handle);
+			   next_task_handle = task1_handle;
 
-    		 }
-    	 }
-    	 pre_button_status = button_status;
-         vTaskDelay(pdMS_TO_TICKS(10));
-     }
-
+		   }
+		}
 }
 
 
@@ -122,18 +158,18 @@ int main(void){
      //SYSVIEW_UART_Config();
 	 SEGGER_SYSVIEW_Conf();
 	 SEGGER_SYSVIEW_Start();
-
+     // clock enable
 	 RCC->AHB1ENR |= GPIOAEN;
 	 RCC->AHB1ENR |= GPIOCEN;
+	 RCC->APB2ENR |= SYSCFGEN;
 	 // LED1 output
 	 GPIOA->MODER |= (1U<<10);
 	 // LED2 output
 	 GPIOA->MODER |= (1U<<12);
 	 // LED3 output
 	 GPIOA->MODER |= (1U<<14);
-     // Button pin input
-	 GPIOC->MODER &= ~(3U << 26); // set as an input
 
+	 EXTI_configuration_for_pc13_button_pin ();
 
 
 	 BaseType_t task1_status = xTaskCreate(task1_handler,"Task-1",200,"Hello from Task1",3,&task1_handle);
@@ -142,7 +178,7 @@ int main(void){
      configASSERT(task2_status== pdPASS);
 	 BaseType_t task3_status = xTaskCreate(task3_handler,"Task-3",200,"Hello from Task3",1,&task3_handle);
      configASSERT(task3_status== pdPASS);
-	 BaseType_t task4_status = xTaskCreate(task4_handler,"Task-4",200,"Hello from Task4",4,&task4_handle);
+	 BaseType_t task4_status = xTaskCreate(task4_handler,"Task-4",200,"Hello from Task4",0,&task4_handle);
      configASSERT(task4_status== pdPASS);
 	 next_task_handle = task1_handle;
      vTaskStartScheduler();
