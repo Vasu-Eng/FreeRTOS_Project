@@ -1,4 +1,4 @@
-# FreeRTOS Project
+# Embedded Linux Real-Time Control Platform 
 
 ## Overview
 
